@@ -3,13 +3,11 @@
 # # Like, comment, share & Don't forget to subscribe [Qwiklab_Explorers_ts](https://youtube.com/@titashshil?si=RgamNu1dc9jVIbJN) 👍😄🤝
 
 ### Turn on `DEVELOPMENT MODE` then goto `Develop` then click on `qwiklabs-ecommerce` & proceed next steps from video.
----
 
 ---
-`user.view` File:
----
 
-```loolml
+- `user.view` File:
+```
 view: users {
   sql_table_name: `cloud-training-demos.looker_ecomm.users`
     ;;
@@ -67,6 +65,114 @@ view: users {
     type: string
     sql: ${TABLE}.first_name ;;
   }
+
+  dimension: gender {
+    type: string
+    sql: ${TABLE}.gender ;;
+  }
+
+  dimension: last_name {
+    type: string
+    sql: ${TABLE}.last_name ;;
+  }
+
+  dimension: latitude {
+    type: number
+    sql: ${TABLE}.latitude ;;
+  }
+
+  dimension: longitude {
+    type: number
+    sql: ${TABLE}.longitude ;;
+  }
+
+  dimension: state {
+    type: string
+    sql: ${TABLE}.state ;;
+    map_layer_name: us_states
+  }
+
+  dimension: traffic_source {
+    type: string
+    sql: ${TABLE}.traffic_source ;;
+  }
+
+  dimension: is_email_source {
+    type: yesno
+    sql: ${traffic_source} = "Email" ;;
+  }
+
+  dimension: zip {
+    type: zipcode
+    sql: ${TABLE}.zip ;;
+  }
+
+  measure: count {
+    type: count
+    drill_fields: [id, last_name, first_name, events.count, order_items.count]
+  }
+}
+```
+
+- `order_items.view` File:
+```
+view: order_items {
+  sql_table_name: `cloud-training-demos.looker_ecomm.order_items`
+    ;;
+  drill_fields: [order_item_id]
+
+  dimension: order_item_id {
+    primary_key: yes
+    type: number
+    sql: ${TABLE}.id ;;
+  }
+
+  dimension_group: created {
+    type: time
+    timeframes: [
+      raw,
+      time,
+      date,
+      week,
+      month,
+      quarter,
+      year
+    ]
+    sql: ${TABLE}.created_at ;;
+  }
+
+  dimension_group: delivered {
+    type: time
+    timeframes: [
+      raw,
+      date,
+      week,
+      month,
+      quarter,
+      year
+    ]
+    convert_tz: no
+    datatype: date
+    sql: ${TABLE}.delivered_at ;;
+  }
+
+  dimension: shipping_days {
+    type: number
+    sql: DATE_DIFF(${shipped_date}, ${created_date}, DAY);;
+  }
+
+  dimension: inventory_item_id {
+    type: number
+    # hidden: yes
+    sql: ${TABLE}.inventory_item_id ;;
+  }
+
+  dimension: order_id {
+    type: number
+    sql: ${TABLE}.order_id ;;
+  }
+
+  dimension_group: returned {
     type: time
     timeframes: [
       raw,
@@ -179,7 +285,6 @@ view: users {
     ]
   }
 }
-
 ```
 
 ---
